@@ -2,57 +2,73 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Test Identificador</title>
+  <title>Identificador de Mascotas</title>
 </head>
 <body>
 
-  <h2>Test Identificador 🐾</h2>
+  <h2>Identificador de Mascotas 🐾</h2>
 
-  <input id="codigo" placeholder="Código">
-  <button id="btn">Consultar</button>
+  <input type="text" id="codigo" placeholder="Ingresá el código">
+  <button id="btnConsultar">Consultar</button>
 
-  <div id="resultado">Esperando…</div>
+  <div id="resultado">Esperando...</div>
 
   <script>
     console.log("SCRIPT CARGADO");
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbx25qNnfQYhGPOU_nccRnZidCsY-BRVbzg0tu5J7kZq3XPQ_TEG2dDQ7d-gvB8P5ZPShg/exec";
+    const API_URL = "https://script.google.com/macros/s/XXXX/exec";
+
+    // Esperamos a que el DOM esté listo
+    document.getElementById("btnConsultar").addEventListener("click", validar);
 
     function validar() {
       console.log("VALIDAR EJECUTADA");
 
-      const codigo = document.getElementById("codigo").value;
+      const codigoInput = document.getElementById("codigo");
       const resultado = document.getElementById("resultado");
+
+      if (!codigoInput || !resultado) {
+        console.error("Elementos no encontrados en el DOM");
+        return;
+      }
+
+      const codigo = codigoInput.value.trim();
+
+      if (!codigo) {
+        resultado.textContent = "Ingresá un código.";
+        return;
+      }
 
       resultado.textContent = "Consultando...";
 
       fetch(API_URL + "?code=" + encodeURIComponent(codigo))
-        .then(r => r.json())
+        .then(res => res.json())
         .then(data => {
           console.log("DATA:", data);
 
           if (!data.exists) {
-            resultado.textContent = "Código no existe";
+            resultado.textContent = "El código ingresado no existe.";
             return;
           }
 
           if (data.status === "NO_ACTIVADO") {
-            resultado.textContent = "Código NO ACTIVADO";
+            resultado.textContent = "Este identificador aún no está activado.";
             return;
           }
 
-          resultado.textContent = "Estado desconocido";
+          if (data.status === "ACTIVO") {
+            resultado.textContent = "Código ACTIVO (próximo paso)";
+            return;
+          }
+
+          resultado.textContent = "Estado desconocido.";
         })
         .catch(err => {
           console.error(err);
-          resultado.textContent = "Error fetch";
+          resultado.textContent = "Error al consultar el código.";
         });
     }
-
-    // 🔥 fuerza el binding del botón
-    document.getElementById("btn").addEventListener("click", validar);
   </script>
 
 </body>
 </html>
-
