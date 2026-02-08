@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Identificador de Mascotas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 220px;
+      text-transform: uppercase;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #mensaje {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🐾 Identificador de Mascotas</h2>
+  <p>Ingresá el código grabado en el identificador</p>
+
+  <input id="codigo" placeholder="PET-XXXXXX" />
+  <br>
+  <button id="btnValidar" type="button">Continuar</button>
+
+  <div id="mensaje"></div>
+
+  <script>
+    // 🔴 PEGÁ ACÁ TU URL REAL DEL APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbwelGP8MddmX2Hh9tPPLbOJu-9dK8vycy9eiZaBBokRp6AQ-Tmo60zjq3o4hxatxFNQWg/exec";
+
+    document.getElementById("btnValidar").addEventListener("click", validar);
+
+    function validar() {
+      const codigo = document.getElementById("codigo").value.trim().toUpperCase();
+      const mensaje = document.getElementById("mensaje");
+
+      if (!codigo) {
+        mensaje.textContent = "Ingresá un código.";
+        return;
+      }
+
+      mensaje.textContent = "Consultando...";
+
+      fetch(API_URL + "?code=" + encodeURIComponent(codigo))
+        .then(response => response.text())
+        .then(texto => {
+          const data = JSON.parse(texto);
+
+          if (!data.exists) {
+            mensaje.textContent = "❌ El código ingresado no existe.";
+          } 
+          else if (data.status === "NO_ACTIVO") {
+            mensaje.textContent = "🟥 Este identificador aún no está activado.";
+            // luego redirigimos al formulario
+          } 
+          else if (data.status === "ACTIVO") {
+            mensaje.textContent = "🟩 Identificador activo.";
+            // luego redirigimos a la ficha pública
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          mensaje.textContent = "Error al validar el código.";
+        });
+    }
+  </script>
+
+</body>
+</html>
