@@ -4,54 +4,20 @@
   <meta charset="UTF-8">
   <title>Identificador de Mascotas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 30px;
-    }
-    .card {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.1);
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #estado {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
 </head>
 
 <body>
 
-  <div class="card">
-    <h2>🐾 Identificador de Mascota</h2>
+  <h2>🐾 Identificador de Mascota</h2>
 
-    <input id="codigo" placeholder="Ej: PET-12345">
-    <button onclick="validar()">Validar</button>
+  <input id="codigo" placeholder="PET-12345">
+  <button onclick="validar()">Validar</button>
 
-    <p id="estado"></p>
-  </div>
+  <p id="estado"></p>
 
-  <!-- FUNCIÓN CALLBACK (OBLIGATORIAMENTE GLOBAL) -->
   <script>
-    function procesarRespuesta(data) {
+    // 🔒 Forzamos el callback en window
+    window.procesarRespuesta = function (data) {
       console.log("DATA:", data);
 
       const estado = document.getElementById("estado");
@@ -62,7 +28,7 @@
       }
 
       if (data.status === "NO_ACTIVADO") {
-        estado.textContent = "⚠️ Código no activado. Debe activarse.";
+        estado.textContent = "⚠️ Código no activado";
         return;
       }
 
@@ -72,25 +38,17 @@
       }
 
       estado.textContent = "⚠️ Estado desconocido";
-    }
-  </script>
+    };
 
-  <!-- FUNCIÓN VALIDAR -->
-  <script>
     function validar() {
       console.log("VALIDAR EJECUTADA");
 
       const codigo = document.getElementById("codigo").value.trim();
       const estado = document.getElementById("estado");
 
-      if (!codigo) {
-        estado.textContent = "Ingresá un código";
-        return;
-      }
-
       estado.textContent = "Consultando...";
 
-      // eliminamos scripts anteriores (importante)
+      // eliminamos scripts previos
       const viejo = document.getElementById("jsonp");
       if (viejo) viejo.remove();
 
@@ -102,8 +60,9 @@
         + "&callback=procesarRespuesta";
 
       document.body.appendChild(script);
-    }
+    };
   </script>
 
 </body>
 </html>
+
