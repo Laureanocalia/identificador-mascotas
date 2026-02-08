@@ -43,54 +43,33 @@
     document.body.appendChild(script);
   }
 
-  function procesarRespuesta(data) {
-    console.log("DATA:", data);
-
-    const resultado = document.getElementById("resultado");
-
-    if (!data.exists) {
-      resultado.textContent = "El código ingresado no existe.";
-      return;
-    }
-
-    if (data.status === "NO_ACTIVADO") {
-      resultado.textContent = "Este identificador aún no está activado.";
-      return;
-    }
-
-    if (data.status === "ACTIVO") {
-      resultado.textContent = "Código ACTIVO";
-      return;
-    }
-
-    resultado.textContent = "Estado desconocido.";
-  }
-
-  document
-    .getElementById("btnConsultar")
-    .addEventListener("click", validar);
-
-    function procesarRespuesta(data) {
+  <script>
+function procesarRespuesta(data) {
   console.log("DATA:", data);
 
-  const resultado = document.getElementById("resultado");
+  const estado = document.getElementById("estado");
+
+  if (!estado) {
+    console.error("Elemento #estado no existe");
+    return;
+  }
 
   if (!data.exists) {
-    resultado.textContent = "El código ingresado no existe.";
+    estado.textContent = "❌ Código inexistente";
     return;
   }
 
   if (data.status === "NO_ACTIVADO") {
-    resultado.textContent = "Este identificador aún no está activado.";
+    estado.textContent = "⚠️ Código no activado";
     return;
   }
 
   if (data.status === "ACTIVO") {
-    resultado.textContent = "Código ACTIVO";
+    estado.textContent = "✅ Código activo";
     return;
   }
 
-  resultado.textContent = "Estado desconocido.";
+  estado.textContent = "⚠️ Estado desconocido";
 }
 
 </script>
