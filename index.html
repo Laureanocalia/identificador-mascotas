@@ -39,45 +39,57 @@
   <div id="mensaje"></div>
 
   <script>
-    // 🔴 PEGÁ ACÁ TU URL REAL DEL APPS SCRIPT
-    const API_URL = "https://script.google.com/macros/s/AKfycbwelGP8MddmX2Hh9tPPLbOJu-9dK8vycy9eiZaBBokRp6AQ-Tmo60zjq3o4hxatxFNQWg/exec";
+  const API_URL = "https://script.google.com/macros/s/XXXX/exec";
 
-    document.getElementById("btnValidar").addEventListener("click", validar);
+  function validar() {
+    const codigo = document.getElementById("codigo").value.trim();
+    const resultado = document.getElementById("resultado");
 
-    function validar() {
-      const codigo = document.getElementById("codigo").value.trim().toUpperCase();
-      const mensaje = document.getElementById("mensaje");
-
-      if (!codigo) {
-        mensaje.textContent = "Ingresá un código.";
-        return;
-      }
-
-      mensaje.textContent = "Consultando...";
-
-      fetch(API_URL + "?code=" + encodeURIComponent(codigo))
-        .then(response => response.text())
-        .then(texto => {
-          const data = JSON.parse(texto);
-
-          if (!data.exists) {
-            mensaje.textContent = "❌ El código ingresado no existe.";
-          } 
-          else if (data.status === "NO_ACTIVO") {
-            mensaje.textContent = "🟥 Este identificador aún no está activado.";
-            // luego redirigimos al formulario
-          } 
-          else if (data.status === "ACTIVO") {
-            mensaje.textContent = "🟩 Identificador activo.";
-            // luego redirigimos a la ficha pública
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          mensaje.textContent = "Error al validar el código.";
-        });
+    if (!codigo) {
+      resultado.textContent = "Ingresá un código válido.";
+      return;
     }
-  </script>
+
+    resultado.textContent = "Consultando...";
+
+    fetch(API_URL + "?code=" + encodeURIComponent(codigo))
+      .then(res => res.json())
+      .then(data => {
+        console.log("Respuesta:", data);
+
+        // ❌ Código inexistente
+        if (!data.exists) {
+          resultado.textContent = "El código ingresado no existe.";
+          return;
+        }
+
+        // 🟥 Existe pero NO está activado
+        if (data.status === "NO_ACTIVADO") {
+          resultado.textContent = "Este identificador aún no está activado.";
+          return;
+        }
+
+        // 🟢 ACTIVO (lo dejamos preparado)
+        if (data.status === "ACTIVO") {
+          resultado.innerHTML = `
+            <strong>Mascota:</strong> ${data.mascota}<br>
+            <strong>Contacto:</strong> ${data.familiar}<br><br>
+            <a href="tel:${data.telefono}">
+              <button>Llamar 📞</button>
+            </a>
+          `;
+          return;
+        }
+
+        resultado.textContent = "Estado desconocido.";
+      })
+      .catch(err => {
+        console.error(err);
+        resultado.textContent = "Error al consultar el código.";
+      });
+  }
+</script>
+
 
 </body>
 </html>
