@@ -14,61 +14,62 @@
   <div id="resultado">Esperando...</div>
 
   <script>
-    console.log("SCRIPT CARGADO");
+  const API_URL = "https://script.google.com/macros/s/AKfycbzUu82duUb3kuG5ej2HgrZz3AZ5mvzLfRuSNgIlGRmzP3mgGrCo3m5VJys4doGj_169og/exec";
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbzUu82duUb3kuG5ej2HgrZz3AZ5mvzLfRuSNgIlGRmzP3mgGrCo3m5VJys4doGj_169og/exec";
+  function validar() {
+    console.log("VALIDAR EJECUTADA");
 
-    // Esperamos a que el DOM esté listo
-    document.getElementById("btnConsultar").addEventListener("click", validar);
+    const codigo = document.getElementById("codigo").value.trim();
+    const resultado = document.getElementById("resultado");
 
-    function validar() {
-      console.log("VALIDAR EJECUTADA");
-
-      const codigoInput = document.getElementById("codigo");
-      const resultado = document.getElementById("resultado");
-
-      if (!codigoInput || !resultado) {
-        console.error("Elementos no encontrados en el DOM");
-        return;
-      }
-
-      const codigo = codigoInput.value.trim();
-
-      if (!codigo) {
-        resultado.textContent = "Ingresá un código.";
-        return;
-      }
-
-      resultado.textContent = "Consultando...";
-
-      fetch(API_URL + "?code=" + encodeURIComponent(codigo))
-        .then(res => res.json())
-        .then(data => {
-          console.log("DATA:", data);
-
-          if (!data.exists) {
-            resultado.textContent = "El código ingresado no existe.";
-            return;
-          }
-
-          if (data.status === "NO_ACTIVADO") {
-            resultado.textContent = "Este identificador aún no está activado.";
-            return;
-          }
-
-          if (data.status === "ACTIVO") {
-            resultado.textContent = "Código ACTIVO (próximo paso)";
-            return;
-          }
-
-          resultado.textContent = "Estado desconocido.";
-        })
-        .catch(err => {
-          console.error(err);
-          resultado.textContent = "Error al consultar el código.";
-        });
+    if (!codigo) {
+      resultado.textContent = "Ingresá un código.";
+      return;
     }
-  </script>
+
+    resultado.textContent = "Consultando...";
+
+    // eliminar script previo si existe
+    const oldScript = document.getElementById("jsonp");
+    if (oldScript) oldScript.remove();
+
+    // crear script JSONP
+    const script = document.createElement("script");
+    script.id = "jsonp";
+    script.src = API_URL +
+      "?code=" + encodeURIComponent(codigo) +
+      "&callback=procesarRespuesta";
+
+    document.body.appendChild(script);
+  }
+
+  function procesarRespuesta(data) {
+    console.log("DATA:", data);
+
+    const resultado = document.getElementById("resultado");
+
+    if (!data.exists) {
+      resultado.textContent = "El código ingresado no existe.";
+      return;
+    }
+
+    if (data.status === "NO_ACTIVADO") {
+      resultado.textContent = "Este identificador aún no está activado.";
+      return;
+    }
+
+    if (data.status === "ACTIVO") {
+      resultado.textContent = "Código ACTIVO";
+      return;
+    }
+
+    resultado.textContent = "Estado desconocido.";
+  }
+
+  document
+    .getElementById("btnConsultar")
+    .addEventListener("click", validar);
+</script>
 
 </body>
 </html>
